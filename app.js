@@ -38,10 +38,13 @@ const CDN_ART =
 let pokemon = [];
 /** @type {Array<any>} */
 let pokedex = [];
+const DEFAULT_TITLE = "POKELIST A VENDA !!!";
+
 let editingId = null;
 let photoDataUrl = "";
 let activeSuggestion = -1;
 let photoManual = false;
+let storeImageDataUrl = "";
 
 const els = {
   photoInput: document.getElementById("photoInput"),
@@ -71,6 +74,24 @@ const els = {
   contactDiscord: document.getElementById("contactDiscord"),
   whatsappLabel: document.getElementById("whatsappLabel"),
   discordLabel: document.getElementById("discordLabel"),
+  titleInput: document.getElementById("titleInput"),
+  titleColorInput: document.getElementById("titleColorInput"),
+  titleSizeInput: document.getElementById("titleSizeInput"),
+  titleFontInput: document.getElementById("titleFontInput"),
+  storeModeText: document.getElementById("storeModeText"),
+  storeModeImage: document.getElementById("storeModeImage"),
+  storeTextFields: document.getElementById("storeTextFields"),
+  storeImageFields: document.getElementById("storeImageFields"),
+  storeNameInput: document.getElementById("storeNameInput"),
+  storeColorInput: document.getElementById("storeColorInput"),
+  storeSizeInput: document.getElementById("storeSizeInput"),
+  storeFontInput: document.getElementById("storeFontInput"),
+  storeImageInput: document.getElementById("storeImageInput"),
+  storeImagePreview: document.getElementById("storeImagePreview"),
+  clearStoreImageBtn: document.getElementById("clearStoreImageBtn"),
+  adTitle: document.getElementById("adTitle"),
+  storeText: document.getElementById("storeText"),
+  storeImage: document.getElementById("storeImage"),
 };
 
 function fillTypeSelects() {
@@ -314,6 +335,58 @@ function renderList() {
     .join("");
 }
 
+function getStoreMode() {
+  return els.storeModeImage.checked ? "image" : "text";
+}
+
+function syncStoreModeFields() {
+  const mode = getStoreMode();
+  els.storeTextFields.hidden = mode !== "text";
+  els.storeImageFields.hidden = mode !== "image";
+}
+
+function setStoreImagePreview(dataUrl) {
+  storeImageDataUrl = dataUrl || "";
+  els.clearStoreImageBtn.disabled = !storeImageDataUrl;
+  if (storeImageDataUrl) {
+    els.storeImagePreview.style.backgroundImage = `url("${storeImageDataUrl}")`;
+    els.storeImagePreview.classList.remove("empty");
+    els.storeImagePreview.textContent = "";
+  } else {
+    els.storeImagePreview.style.backgroundImage = "";
+    els.storeImagePreview.classList.add("empty");
+    els.storeImagePreview.textContent = "Clique para enviar o logo";
+  }
+}
+
+function renderHeader() {
+  const title = els.titleInput.value.trim() || DEFAULT_TITLE;
+  const titleColor = els.titleColorInput.value || "#39ff14";
+  const titleSize = Number(els.titleSizeInput.value) || 34;
+  const titleFont = els.titleFontInput.value || "Arial, Helvetica, sans-serif";
+
+  els.adTitle.textContent = title;
+  els.adTitle.style.color = titleColor;
+  els.adTitle.style.fontSize = `${titleSize}px`;
+  els.adTitle.style.fontFamily = titleFont;
+  els.adTitle.style.textShadow = `0 0 10px ${titleColor}88`;
+
+  const mode = getStoreMode();
+  if (mode === "image" && storeImageDataUrl) {
+    els.storeText.hidden = true;
+    els.storeImage.hidden = false;
+    els.storeImage.src = storeImageDataUrl;
+  } else {
+    els.storeImage.hidden = true;
+    els.storeImage.removeAttribute("src");
+    els.storeText.hidden = false;
+    els.storeText.textContent = els.storeNameInput.value.trim() || "Loja";
+    els.storeText.style.color = els.storeColorInput.value || "#ffcb05";
+    els.storeText.style.fontSize = `${Number(els.storeSizeInput.value) || 28}px`;
+    els.storeText.style.fontFamily = els.storeFontInput.value || "Arial, Helvetica, sans-serif";
+  }
+}
+
 function renderFooterContacts() {
   const wa = els.contactWhatsapp.value.trim();
   const discord = els.contactDiscord.value.trim();
@@ -329,6 +402,7 @@ function renderFooterContacts() {
 }
 
 function renderAd() {
+  renderHeader();
   renderFooterContacts();
 
   if (!pokemon.length) {
@@ -386,6 +460,16 @@ function persist() {
     contactWhatsapp: els.contactWhatsapp.value,
     contactDiscord: els.contactDiscord.value,
     showPix: els.showPix.checked,
+    title: els.titleInput.value,
+    titleColor: els.titleColorInput.value,
+    titleSize: els.titleSizeInput.value,
+    titleFont: els.titleFontInput.value,
+    storeMode: getStoreMode(),
+    storeName: els.storeNameInput.value,
+    storeColor: els.storeColorInput.value,
+    storeSize: els.storeSizeInput.value,
+    storeFont: els.storeFontInput.value,
+    storeImage: storeImageDataUrl,
   };
   localStorage.setItem("pokelist-ad", JSON.stringify(payload));
 }
@@ -399,6 +483,24 @@ function restore() {
     els.contactWhatsapp.value = data.contactWhatsapp || "";
     els.contactDiscord.value = data.contactDiscord || "";
     els.showPix.checked = data.showPix !== false;
+
+    els.titleInput.value = data.title || DEFAULT_TITLE;
+    els.titleColorInput.value = data.titleColor || "#39ff14";
+    els.titleSizeInput.value = data.titleSize || "34";
+    if (data.titleFont) els.titleFontInput.value = data.titleFont;
+
+    els.storeNameInput.value = data.storeName || "Pokémon";
+    els.storeColorInput.value = data.storeColor || "#ffcb05";
+    els.storeSizeInput.value = data.storeSize || "28";
+    if (data.storeFont) els.storeFontInput.value = data.storeFont;
+
+    if (data.storeMode === "image") {
+      els.storeModeImage.checked = true;
+    } else {
+      els.storeModeText.checked = true;
+    }
+    setStoreImagePreview(data.storeImage || "");
+    syncStoreModeFields();
   } catch {
     pokemon = [];
   }
@@ -549,6 +651,45 @@ els.showPix.addEventListener("change", refresh);
 els.contactWhatsapp.addEventListener("input", refresh);
 els.contactDiscord.addEventListener("input", refresh);
 
+[
+  els.titleInput,
+  els.titleColorInput,
+  els.titleSizeInput,
+  els.titleFontInput,
+  els.storeNameInput,
+  els.storeColorInput,
+  els.storeSizeInput,
+  els.storeFontInput,
+].forEach((el) => el.addEventListener("input", refresh));
+
+els.storeModeText.addEventListener("change", () => {
+  syncStoreModeFields();
+  refresh();
+});
+els.storeModeImage.addEventListener("change", () => {
+  syncStoreModeFields();
+  refresh();
+});
+
+els.storeImageInput.addEventListener("change", () => {
+  const file = els.storeImageInput.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    setStoreImagePreview(String(reader.result || ""));
+    els.storeModeImage.checked = true;
+    syncStoreModeFields();
+    refresh();
+  };
+  reader.readAsDataURL(file);
+});
+
+els.clearStoreImageBtn.addEventListener("click", () => {
+  els.storeImageInput.value = "";
+  setStoreImagePreview("");
+  refresh();
+});
+
 els.pokemonList.addEventListener("click", (e) => {
   const btn = e.target.closest("button");
   if (!btn) return;
@@ -568,6 +709,7 @@ els.pokemonList.addEventListener("click", (e) => {
 
 fillTypeSelects();
 restore();
+syncStoreModeFields();
 clearForm();
 refresh();
 loadPokedex();

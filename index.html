@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gerador de Anúncio Pokelist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@700&family=Press+Start+2P&family=Rubik:wght@800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
@@ -14,6 +17,89 @@
         <h1>Gerador de Anúncio</h1>
         <p>Monte a lista e exporte para o WhatsApp</p>
       </header>
+
+      <section class="card">
+        <h2>Cabeçalho</h2>
+        <label>
+          Título do anúncio
+          <input id="titleInput" type="text" value="POKELIST A VENDA !!!" />
+        </label>
+        <div class="grid-2">
+          <label>
+            Cor do título
+            <input id="titleColorInput" type="color" value="#39ff14" />
+          </label>
+          <label>
+            Tamanho
+            <input id="titleSizeInput" type="number" min="16" max="72" value="34" />
+          </label>
+        </div>
+        <label>
+          Fonte do título
+          <select id="titleFontInput">
+            <option value="Arial, Helvetica, sans-serif">Arial</option>
+            <option value="'Rubik', Arial, sans-serif" selected>Rubik</option>
+            <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue</option>
+            <option value="'Oswald', Arial, sans-serif">Oswald</option>
+            <option value="'Press Start 2P', monospace">Press Start</option>
+            <option value="Impact, Haettenschweiler, sans-serif">Impact</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="Verdana, Geneva, sans-serif">Verdana</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Nome da loja</h2>
+        <div class="radio-row">
+          <label class="check">
+            <input type="radio" name="storeMode" id="storeModeText" value="text" checked />
+            Texto
+          </label>
+          <label class="check">
+            <input type="radio" name="storeMode" id="storeModeImage" value="image" />
+            Imagem
+          </label>
+        </div>
+
+        <div id="storeTextFields">
+          <label>
+            Nome da loja
+            <input id="storeNameInput" type="text" value="Pokémon" />
+          </label>
+          <div class="grid-2">
+            <label>
+              Cor
+              <input id="storeColorInput" type="color" value="#ffcb05" />
+            </label>
+            <label>
+              Tamanho
+              <input id="storeSizeInput" type="number" min="12" max="48" value="28" />
+            </label>
+          </div>
+          <label>
+            Fonte
+            <select id="storeFontInput">
+              <option value="'Rubik', Arial, sans-serif" selected>Rubik</option>
+              <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue</option>
+              <option value="'Oswald', Arial, sans-serif">Oswald</option>
+              <option value="'Press Start 2P', monospace">Press Start</option>
+              <option value="Impact, Haettenschweiler, sans-serif">Impact</option>
+              <option value="Arial, Helvetica, sans-serif">Arial</option>
+              <option value="Georgia, serif">Georgia</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="storeImageFields" hidden>
+          <label class="photo-upload">
+            <span>Logo da loja</span>
+            <input id="storeImageInput" type="file" accept="image/*" />
+            <div id="storeImagePreview" class="photo-preview empty store-logo-preview">Clique para enviar o logo</div>
+          </label>
+          <button id="clearStoreImageBtn" type="button" class="btn ghost" disabled>Remover logo</button>
+        </div>
+      </section>
 
       <section class="card">
         <h2>Contato / Rodapé</h2>
@@ -135,10 +221,11 @@
       <div class="preview-stage">
         <div id="adCanvas" class="ad-canvas">
           <header class="ad-header">
-            <div class="poke-logo" aria-hidden="true">
-              <span class="poke-logo-text">Pokémon</span>
+            <div id="storeBrand" class="store-brand">
+              <span id="storeText" class="store-text">Pokémon</span>
+              <img id="storeImage" class="store-image" alt="Logo da loja" hidden />
             </div>
-            <h1 class="ad-title">POKELIST A VENDA !!!</h1>
+            <h1 id="adTitle" class="ad-title">POKELIST A VENDA !!!</h1>
             <div class="coin" aria-hidden="true">$</div>
           </header>
 

@@ -166,6 +166,12 @@ input[type="color"] {
   font-size: 0.8rem;
 }
 
+.radio-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .photo-upload {
   cursor: pointer;
 }
@@ -173,6 +179,10 @@ input[type="color"] {
 .photo-upload small {
   color: var(--muted);
   font-weight: 400;
+}
+
+.store-logo-preview {
+  height: 90px;
 }
 
 .photo-upload input {
@@ -323,15 +333,33 @@ input[type="color"] {
   margin-bottom: 10px;
 }
 
-.poke-logo-text {
+.store-brand {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.store-text {
   font-weight: 900;
   font-size: 28px;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
   color: #ffcb05;
+  line-height: 1.05;
+  word-break: break-word;
   text-shadow:
     2px 2px 0 #2a75bb,
     -1px -1px 0 #e3350d,
     0 0 8px rgba(255, 203, 5, 0.35);
+}
+
+.store-image {
+  max-width: 120px;
+  max-height: 56px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 .ad-title {
@@ -341,7 +369,8 @@ input[type="color"] {
   font-size: 34px;
   font-weight: 900;
   letter-spacing: 0.5px;
-  text-shadow: 0 0 10px rgba(57, 255, 20, 0.55);
+  line-height: 1.05;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.45);
 }
 
 .coin {
