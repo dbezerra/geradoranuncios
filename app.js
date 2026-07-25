@@ -61,6 +61,8 @@ const els = {
   pixBadge: document.getElementById("pixBadge"),
   contactWhatsapp: document.getElementById("contactWhatsapp"),
   contactDiscord: document.getElementById("contactDiscord"),
+  whatsappLabel: document.getElementById("whatsappLabel"),
+  discordLabel: document.getElementById("discordLabel"),
 };
 
 function fillTypeSelects() {
@@ -73,7 +75,7 @@ function fillTypeSelects() {
       select.appendChild(opt);
     });
   }
-  els.type1Input.value = "dark";
+  els.type1Input.value = "";
   els.type2Input.value = "";
 }
 
@@ -93,21 +95,27 @@ function readForm() {
     photo: photoDataUrl,
     name: els.nameInput.value.trim(),
     color: els.colorInput.value,
-    level: els.levelInput.value || "100",
-    size: els.sizeInput.value.trim() || "1.00",
+    level: els.levelInput.value.trim(),
+    size: els.sizeInput.value.trim(),
     type1: els.type1Input.value,
     type2: els.type2Input.value,
     rarity: els.rarityInput.value,
     price: els.priceInput.value.trim(),
-    iv: els.ivInput.value || "0",
-    ivMax: els.ivMaxInput.value || "192",
+    iv: els.ivInput.value.trim(),
+    ivMax: els.ivMaxInput.value.trim(),
   };
 }
 
 function validate(data) {
   if (!data.photo) return "Envie a foto do Pokémon.";
   if (!data.name) return "Informe o nome do Pokémon.";
+  if (!data.level) return "Informe o level.";
+  if (!data.size) return "Informe o multiplicador.";
   if (!data.type1) return "Selecione pelo menos o Tipo 1.";
+  if (!data.rarity) return "Selecione a raridade.";
+  if (!data.price) return "Informe o preço.";
+  if (!data.iv) return "Informe o IV.";
+  if (!data.ivMax) return "Informe o IV máximo.";
   return "";
 }
 
@@ -120,14 +128,14 @@ function clearForm() {
   els.photoPreview.textContent = "Clique para enviar";
   els.nameInput.value = "";
   els.colorInput.value = NAME_COLORS[pokemon.length % NAME_COLORS.length];
-  els.levelInput.value = "100";
-  els.sizeInput.value = "1.95";
-  els.type1Input.value = "dark";
+  els.levelInput.value = "";
+  els.sizeInput.value = "";
+  els.type1Input.value = "";
   els.type2Input.value = "";
-  els.rarityInput.value = "Lendária";
+  els.rarityInput.value = "";
   els.priceInput.value = "";
-  els.ivInput.value = "135";
-  els.ivMaxInput.value = "192";
+  els.ivInput.value = "";
+  els.ivMaxInput.value = "";
   els.addBtn.textContent = "Adicionar à lista";
 }
 
@@ -181,8 +189,22 @@ function renderList() {
     .join("");
 }
 
-function renderAd() {
+function renderFooterContacts() {
+  const wa = els.contactWhatsapp.value.trim();
+  const discord = els.contactDiscord.value.trim();
+
+  els.whatsappLabel.textContent = wa || "informe o número";
+  els.whatsappLabel.style.opacity = wa ? "1" : "0.45";
+
+  els.discordLabel.textContent = discord || "informe o discord";
+  els.discordLabel.style.opacity = discord ? "1" : "0.45";
+
+  els.pixBadge.textContent = "aceitamos pix";
   els.pixBadge.style.display = els.showPix.checked ? "inline-block" : "none";
+}
+
+function renderAd() {
+  renderFooterContacts();
 
   if (!pokemon.length) {
     els.adRows.innerHTML = `<div class="ad-empty">Adicione Pokémon para montar o anúncio</div>`;
@@ -348,8 +370,8 @@ els.clearAllBtn.addEventListener("click", () => {
 
 els.exportBtn.addEventListener("click", exportAd);
 els.showPix.addEventListener("change", refresh);
-els.contactWhatsapp.addEventListener("input", persist);
-els.contactDiscord.addEventListener("input", persist);
+els.contactWhatsapp.addEventListener("input", refresh);
+els.contactDiscord.addEventListener("input", refresh);
 
 els.pokemonList.addEventListener("click", (e) => {
   const btn = e.target.closest("button");
@@ -370,5 +392,5 @@ els.pokemonList.addEventListener("click", (e) => {
 
 fillTypeSelects();
 restore();
-els.colorInput.value = NAME_COLORS[pokemon.length % NAME_COLORS.length];
+clearForm();
 refresh();

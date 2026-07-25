@@ -423,7 +423,23 @@ input[type="color"] {
 
 .social {
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact-line {
+  display: flex;
+  align-items: center;
   gap: 8px;
+  min-height: 34px;
+}
+
+.contact-text {
+  color: #fff;
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 1.1;
+  word-break: break-word;
 }
 
 .icon {
@@ -434,6 +450,7 @@ input[type="color"] {
   place-items: center;
   font-weight: 900;
   font-size: 14px;
+  flex-shrink: 0;
 }
 
 .icon.discord { background: #5865f2; }
@@ -443,10 +460,11 @@ input[type="color"] {
   background: #32bcad;
   color: #fff;
   font-weight: 900;
-  font-size: 20px;
-  padding: 4px 14px;
+  font-size: 16px;
+  padding: 6px 12px;
   border-radius: 6px;
-  letter-spacing: 1px;
+  letter-spacing: 0.3px;
+  text-transform: lowercase;
 }
 
 .footer-center {
