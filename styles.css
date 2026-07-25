@@ -1,0 +1,533 @@
+:root {
+  --bg: #111318;
+  --panel: #1a1d24;
+  --card: #22262f;
+  --text: #f2f4f8;
+  --muted: #9aa3b2;
+  --line: #ff8a1f;
+  --green: #39ff14;
+  --accent: #25d366;
+  --danger: #ff4d4d;
+  --blue: #1e90ff;
+  --gold: #f5c542;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(circle at top, #1c2030, var(--bg));
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: minmax(320px, 420px) 1fr;
+  gap: 20px;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.panel-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.panel-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid #2e3440;
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card h2 {
+  margin: 0 0 2px;
+  font-size: 1rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+label.check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  background: #12151b;
+  color: var(--text);
+  border: 1px solid #3a4150;
+  border-radius: 8px;
+  padding: 9px 10px;
+}
+
+input[type="color"] {
+  height: 40px;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #3a4150;
+  background: #12151b;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.photo-upload {
+  cursor: pointer;
+}
+
+.photo-upload input {
+  display: none;
+}
+
+.photo-preview {
+  height: 110px;
+  border: 1px dashed #4a5364;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #12151b center/contain no-repeat;
+  color: var(--muted);
+  overflow: hidden;
+}
+
+.photo-preview:not(.empty) {
+  border-style: solid;
+  color: transparent;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #fff;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn.primary { background: #3b82f6; }
+.btn.success { background: var(--accent); color: #06210f; }
+.btn.danger { background: var(--danger); }
+.btn.ghost { background: #343b49; }
+
+.pokemon-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.pokemon-list li {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  background: #12151b;
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.pokemon-list img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  background: #000;
+  border-radius: 8px;
+}
+
+.pokemon-list .meta strong {
+  display: block;
+}
+
+.pokemon-list .meta span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.pokemon-list .row-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.pokemon-list button {
+  border: 0;
+  background: #2b3240;
+  color: #fff;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.preview-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.preview-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.preview-toolbar h2 {
+  margin: 0;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.preview-stage {
+  overflow: auto;
+  background: #0b0d11;
+  border: 1px solid #2e3440;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== AD CANVAS (WhatsApp export look) ===== */
+.ad-canvas {
+  width: 720px;
+  background: #000;
+  color: #fff;
+  padding: 14px 12px 16px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.ad-header {
+  display: grid;
+  grid-template-columns: 120px 1fr 70px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.poke-logo-text {
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: -1px;
+  color: #ffcb05;
+  text-shadow:
+    2px 2px 0 #2a75bb,
+    -1px -1px 0 #e3350d,
+    0 0 8px rgba(255, 203, 5, 0.35);
+}
+
+.ad-title {
+  margin: 0;
+  text-align: center;
+  color: var(--green);
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.55);
+}
+
+.coin {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  font-weight: 900;
+  color: #1a1200;
+  background: radial-gradient(circle at 35% 30%, #ffe27a, #d4a017 55%, #8a6a00);
+  border: 3px solid #fff2a8;
+  box-shadow: 0 0 10px rgba(245, 197, 66, 0.45);
+}
+
+.ad-rows {
+  border-top: 2px solid var(--line);
+}
+
+.ad-empty {
+  padding: 40px 12px;
+  text-align: center;
+  color: #777;
+  border-bottom: 2px solid var(--line);
+}
+
+.ad-row {
+  display: grid;
+  grid-template-columns: 64px 1.25fr 58px 2px 95px 2px 120px 2px 90px;
+  align-items: center;
+  gap: 6px;
+  min-height: 74px;
+  padding: 6px 4px;
+  border-bottom: 2px solid var(--line);
+}
+
+.ad-row img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.ad-name {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+.ad-level {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.types {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.type-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 900;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  line-height: 1;
+}
+
+.vsep {
+  width: 2px;
+  height: 56px;
+  background: var(--line);
+  justify-self: center;
+}
+
+.size-block {
+  text-align: center;
+}
+
+.size-block .size {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.size-block .rarity {
+  color: var(--line);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.iv-block {
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.price-block {
+  text-align: center;
+  font-weight: 900;
+}
+
+.price-block .label {
+  color: var(--gold);
+  font-size: 12px;
+  letter-spacing: 0.4px;
+}
+
+.price-block .value {
+  font-size: 18px;
+  color: #fff;
+}
+
+.ad-footer {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.social {
+  display: flex;
+  gap: 8px;
+}
+
+.icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.icon.discord { background: #5865f2; }
+.icon.whatsapp { background: #25d366; color: #063216; }
+
+.pix-badge {
+  background: #32bcad;
+  color: #fff;
+  font-weight: 900;
+  font-size: 20px;
+  padding: 4px 14px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+}
+
+.footer-center {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.cta {
+  width: 100%;
+  max-width: 280px;
+  text-align: center;
+  border-radius: 999px;
+  font-weight: 900;
+  padding: 10px 14px;
+  letter-spacing: 0.3px;
+}
+
+.cta.green {
+  background: #25d366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.wa-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #128c7e;
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+.cta.blue {
+  background: #1e90ff;
+  color: #fff;
+}
+
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.badge .shield,
+.badge .seal {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+}
+
+.badge.secure { color: #39ff14; }
+.badge.secure .shield { background: #1f8f3a; color: #fff; }
+
+.badge.quality { color: #fff; }
+.badge.quality .seal {
+  background: radial-gradient(circle at 35% 30%, #ffe27a, #d4a017);
+  color: #3a2a00;
+}
+
+@media (max-width: 1100px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    max-height: none;
+  }
+}

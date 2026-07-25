@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gerador de Anúncio Pokelist</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="panel">
+      <header class="panel-header">
+        <h1>Gerador de Anúncio</h1>
+        <p>Monte a lista e exporte para o WhatsApp</p>
+      </header>
+
+      <section class="card">
+        <h2>Contato / Rodapé</h2>
+        <label>
+          WhatsApp
+          <input id="contactWhatsapp" type="text" placeholder="5511999999999" value="" />
+        </label>
+        <label>
+          Discord
+          <input id="contactDiscord" type="text" placeholder="seuusuario" value="" />
+        </label>
+        <label class="check">
+          <input id="showPix" type="checkbox" checked />
+          Mostrar PIX
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Adicionar Pokémon</h2>
+
+        <label class="photo-upload">
+          <span>Foto do Pokémon</span>
+          <input id="photoInput" type="file" accept="image/*" />
+          <div id="photoPreview" class="photo-preview empty">Clique para enviar</div>
+        </label>
+
+        <div class="grid-2">
+          <label>
+            Nome
+            <input id="nameInput" type="text" placeholder="Umbreon" />
+          </label>
+          <label>
+            Cor do nome
+            <input id="colorInput" type="color" value="#ff4444" />
+          </label>
+        </div>
+
+        <div class="grid-2">
+          <label>
+            Level
+            <input id="levelInput" type="number" min="1" max="100" value="100" />
+          </label>
+          <label>
+            Multiplicador
+            <input id="sizeInput" type="text" placeholder="1.95" value="1.95" />
+          </label>
+        </div>
+
+        <div class="grid-2">
+          <label>
+            Tipo 1
+            <select id="type1Input"></select>
+          </label>
+          <label>
+            Tipo 2
+            <select id="type2Input"></select>
+          </label>
+        </div>
+
+        <div class="grid-2">
+          <label>
+            Raridade
+            <select id="rarityInput">
+              <option value="Lendária">Lendária</option>
+              <option value="Épica">Épica</option>
+              <option value="Rara">Rara</option>
+              <option value="Comum">Comum</option>
+            </select>
+          </label>
+          <label>
+            Preço (R$)
+            <input id="priceInput" type="text" placeholder="150" />
+          </label>
+        </div>
+
+        <div class="grid-2">
+          <label>
+            IV
+            <input id="ivInput" type="number" min="0" value="135" />
+          </label>
+          <label>
+            IV máximo
+            <input id="ivMaxInput" type="number" min="0" value="192" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="addBtn" type="button" class="btn primary">Adicionar à lista</button>
+          <button id="clearFormBtn" type="button" class="btn ghost">Limpar</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Lista (<span id="listCount">0</span>)</h2>
+        <ul id="pokemonList" class="pokemon-list"></ul>
+        <div class="actions">
+          <button id="exportBtn" type="button" class="btn success" disabled>Baixar anúncio (JPG)</button>
+          <button id="clearAllBtn" type="button" class="btn danger" disabled>Limpar lista</button>
+        </div>
+      </section>
+    </aside>
+
+    <main class="preview-wrap">
+      <div class="preview-toolbar">
+        <h2>Prévia do anúncio</h2>
+        <span class="hint">O arquivo exportado fica compacto para WhatsApp</span>
+      </div>
+
+      <div class="preview-stage">
+        <div id="adCanvas" class="ad-canvas">
+          <header class="ad-header">
+            <div class="poke-logo" aria-hidden="true">
+              <span class="poke-logo-text">Pokémon</span>
+            </div>
+            <h1 class="ad-title">POKELIST A VENDA !!!</h1>
+            <div class="coin" aria-hidden="true">$</div>
+          </header>
+
+          <div id="adRows" class="ad-rows">
+            <div class="ad-empty">Adicione Pokémon para montar o anúncio</div>
+          </div>
+
+          <footer class="ad-footer">
+            <div class="footer-left">
+              <div class="social">
+                <span class="icon discord" title="Discord">D</span>
+                <span class="icon whatsapp" title="WhatsApp">W</span>
+              </div>
+              <div id="pixBadge" class="pix-badge">Pix</div>
+            </div>
+
+            <div class="footer-center">
+              <div class="cta green">
+                <span class="wa-dot"></span>
+                ENTRE EM CONTATO
+              </div>
+              <div class="cta blue">CONTACT US</div>
+            </div>
+
+            <div class="footer-right">
+              <div class="badge secure">
+                <span class="shield">✓</span>
+                <span>COMPRA SEGURA</span>
+              </div>
+              <div class="badge quality">
+                <span class="seal">★</span>
+                <span>QUALIDADE GARANTIDA</span>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
