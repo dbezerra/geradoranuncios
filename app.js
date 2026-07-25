@@ -31,15 +31,23 @@ const NAME_COLORS = [
   "#00e5ff",
 ];
 
+const CDN_ART =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork";
+
 /** @type {Array<any>} */
 let pokemon = [];
+/** @type {Array<any>} */
+let pokedex = [];
 let editingId = null;
 let photoDataUrl = "";
+let activeSuggestion = -1;
+let photoManual = false;
 
 const els = {
   photoInput: document.getElementById("photoInput"),
   photoPreview: document.getElementById("photoPreview"),
   nameInput: document.getElementById("nameInput"),
+  nameSuggestions: document.getElementById("nameSuggestions"),
   colorInput: document.getElementById("colorInput"),
   levelInput: document.getElementById("levelInput"),
   sizeInput: document.getElementById("sizeInput"),
@@ -90,6 +98,125 @@ function formatPrice(value) {
   return `R$ ${cleaned}`;
 }
 
+function normalize(text) {
+  return String(text || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function imageUrlFor(entry) {
+  if (entry?.image) return entry.image;
+  if (entry?.id) return `${CDN_ART}/${entry.id}.png`;
+  return "";
+}
+
+function thumbUrlFor(entry) {
+  return imageUrlFor(entry);
+}
+
+function setPhotoPreview(dataUrl) {
+  photoDataUrl = dataUrl || "";
+  if (photoDataUrl) {
+    els.photoPreview.style.backgroundImage = `url("${photoDataUrl}")`;
+    els.photoPreview.classList.remove("empty");
+    els.photoPreview.textContent = "";
+  } else {
+    els.photoPreview.style.backgroundImage = "";
+    els.photoPreview.classList.add("empty");
+    els.photoPreview.textContent = "Escolha um Pokémon ou envie uma foto";
+  }
+}
+
+async function loadImageAsDataUrl(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const blob = await res.blob();
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function applyPokedexEntry(entry) {
+  if (!entry) return;
+  els.nameInput.value = entry.name;
+  photoManual = false;
+
+  if (entry.types?.[0]) els.type1Input.value = entry.types[0];
+  els.type2Input.value = entry.types?.[1] || "";
+
+  els.photoPreview.textContent = "Carregando foto...";
+  els.photoPreview.classList.remove("empty");
+
+  const localUrl = entry.image || `pokemon/images/${entry.id}.webp`;
+  const urls = [
+    localUrl,
+    `pokemon/images/${entry.id}.png`,
+    `${CDN_ART}/${entry.id}.png`,
+  ];
+
+  let loaded = "";
+  for (const url of urls) {
+    try {
+      loaded = await loadImageAsDataUrl(url);
+      if (loaded) break;
+    } catch {
+      // try next source
+    }
+  }
+
+  if (loaded) {
+    setPhotoPreview(loaded);
+  } else {
+    setPhotoPreview("");
+    alert("Não foi possível carregar a foto deste Pokémon. Você pode enviar manualmente.");
+  }
+}
+
+function hideSuggestions() {
+  els.nameSuggestions.hidden = true;
+  els.nameSuggestions.innerHTML = "";
+  activeSuggestion = -1;
+}
+
+function renderSuggestions(items) {
+  if (!items.length) {
+    hideSuggestions();
+    return;
+  }
+
+  els.nameSuggestions.hidden = false;
+  els.nameSuggestions.innerHTML = items
+    .map(
+      (p, index) => `
+      <li data-index="${index}" data-id="${p.id}" class="${index === activeSuggestion ? "active" : ""}">
+        <img src="${thumbUrlFor(p)}" alt="" loading="lazy" />
+        <span class="poke-name">${escapeHtml(p.name)}${p.namePt && p.namePt !== p.name ? ` <small style="color:#9aa3b2">(${escapeHtml(p.namePt)})</small>` : ""}</span>
+        <span class="poke-id">#${String(p.id).padStart(3, "0")}</span>
+      </li>`
+    )
+    .join("");
+}
+
+function filterPokedex(query) {
+  const q = normalize(query);
+  if (q.length < 1) return [];
+  return pokedex
+    .filter((p) => {
+      return (
+        normalize(p.name).includes(q) ||
+        normalize(p.namePt).includes(q) ||
+        normalize(p.slug).includes(q) ||
+        String(p.id) === q
+      );
+    })
+    .slice(0, 12);
+}
+
 function readForm() {
   return {
     photo: photoDataUrl,
@@ -102,12 +229,12 @@ function readForm() {
     rarity: els.rarityInput.value,
     price: els.priceInput.value.trim(),
     iv: els.ivInput.value.trim(),
-    ivMax: els.ivMaxInput.value.trim(),
+    ivMax: els.ivMaxInput.value.trim() || "192",
   };
 }
 
 function validate(data) {
-  if (!data.photo) return "Envie a foto do Pokémon.";
+  if (!data.photo) return "Escolha um Pokémon (foto) ou envie uma imagem.";
   if (!data.name) return "Informe o nome do Pokémon.";
   if (!data.level) return "Informe o level.";
   if (!data.size) return "Informe o multiplicador.";
@@ -115,18 +242,17 @@ function validate(data) {
   if (!data.rarity) return "Selecione a raridade.";
   if (!data.price) return "Informe o preço.";
   if (!data.iv) return "Informe o IV.";
-  if (!data.ivMax) return "Informe o IV máximo.";
   return "";
 }
 
 function clearForm() {
   editingId = null;
+  photoManual = false;
   photoDataUrl = "";
   els.photoInput.value = "";
-  els.photoPreview.style.backgroundImage = "";
-  els.photoPreview.classList.add("empty");
-  els.photoPreview.textContent = "Clique para enviar";
+  setPhotoPreview("");
   els.nameInput.value = "";
+  hideSuggestions();
   els.colorInput.value = NAME_COLORS[pokemon.length % NAME_COLORS.length];
   els.levelInput.value = "";
   els.sizeInput.value = "";
@@ -135,17 +261,16 @@ function clearForm() {
   els.rarityInput.value = "";
   els.priceInput.value = "";
   els.ivInput.value = "";
-  els.ivMaxInput.value = "";
+  els.ivMaxInput.value = "192";
   els.addBtn.textContent = "Adicionar à lista";
 }
 
 function setForm(item) {
   editingId = item.id;
-  photoDataUrl = item.photo;
-  els.photoPreview.style.backgroundImage = `url("${item.photo}")`;
-  els.photoPreview.classList.remove("empty");
-  els.photoPreview.textContent = "";
+  photoManual = true;
+  setPhotoPreview(item.photo);
   els.nameInput.value = item.name;
+  hideSuggestions();
   els.colorInput.value = item.color;
   els.levelInput.value = item.level;
   els.sizeInput.value = item.size;
@@ -154,7 +279,7 @@ function setForm(item) {
   els.rarityInput.value = item.rarity;
   els.priceInput.value = item.price;
   els.ivInput.value = item.iv;
-  els.ivMaxInput.value = item.ivMax;
+  els.ivMaxInput.value = item.ivMax || "192";
   els.addBtn.textContent = "Salvar alterações";
 }
 
@@ -293,7 +418,6 @@ async function exportAd() {
       logging: false,
     });
 
-    // Compact JPEG for WhatsApp
     const maxWidth = 720;
     const ratio = maxWidth / canvas.width;
     const out = document.createElement("canvas");
@@ -325,17 +449,69 @@ function moveItem(id, dir) {
   refresh();
 }
 
+async function loadPokedex() {
+  try {
+    const res = await fetch("data/pokemon.json");
+    if (!res.ok) throw new Error("missing json");
+    pokedex = await res.json();
+  } catch {
+    // Fallback mínimo se o JSON ainda não existir
+    pokedex = [];
+    console.warn("Pokédex local indisponível. Rode scripts/download_pokemon.py");
+  }
+}
+
 els.photoInput.addEventListener("change", () => {
   const file = els.photoInput.files?.[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    photoDataUrl = String(reader.result || "");
-    els.photoPreview.style.backgroundImage = `url("${photoDataUrl}")`;
-    els.photoPreview.classList.remove("empty");
-    els.photoPreview.textContent = "";
+    photoManual = true;
+    setPhotoPreview(String(reader.result || ""));
   };
   reader.readAsDataURL(file);
+});
+
+els.nameInput.addEventListener("input", () => {
+  const matches = filterPokedex(els.nameInput.value);
+  activeSuggestion = matches.length ? 0 : -1;
+  renderSuggestions(matches);
+});
+
+els.nameInput.addEventListener("keydown", async (e) => {
+  const items = [...els.nameSuggestions.querySelectorAll("li")];
+  if (!items.length) return;
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    activeSuggestion = (activeSuggestion + 1) % items.length;
+    renderSuggestions(filterPokedex(els.nameInput.value));
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    activeSuggestion = (activeSuggestion - 1 + items.length) % items.length;
+    renderSuggestions(filterPokedex(els.nameInput.value));
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    const id = Number(items[Math.max(activeSuggestion, 0)]?.dataset.id);
+    const entry = pokedex.find((p) => p.id === id);
+    hideSuggestions();
+    await applyPokedexEntry(entry);
+  } else if (e.key === "Escape") {
+    hideSuggestions();
+  }
+});
+
+els.nameSuggestions.addEventListener("mousedown", async (e) => {
+  const li = e.target.closest("li");
+  if (!li) return;
+  e.preventDefault();
+  const entry = pokedex.find((p) => p.id === Number(li.dataset.id));
+  hideSuggestions();
+  await applyPokedexEntry(entry);
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".name-field")) hideSuggestions();
 });
 
 els.addBtn.addEventListener("click", () => {
@@ -394,3 +570,4 @@ fillTypeSelects();
 restore();
 clearForm();
 refresh();
+loadPokedex();

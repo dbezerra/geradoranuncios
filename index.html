@@ -34,22 +34,28 @@
       <section class="card">
         <h2>Adicionar Pokémon</h2>
 
-        <label class="photo-upload">
-          <span>Foto do Pokémon</span>
-          <input id="photoInput" type="file" accept="image/*" />
-          <div id="photoPreview" class="photo-preview empty">Clique para enviar</div>
+        <label class="name-field">
+          Nome do Pokémon
+          <input
+            id="nameInput"
+            type="text"
+            placeholder="Digite para buscar..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <ul id="nameSuggestions" class="name-suggestions" hidden></ul>
         </label>
 
-        <div class="grid-2">
-          <label>
-            Nome
-            <input id="nameInput" type="text" placeholder="Umbreon" />
-          </label>
-          <label>
-            Cor do nome
-            <input id="colorInput" type="color" value="#ff4444" />
-          </label>
-        </div>
+        <label class="photo-upload">
+          <span>Foto do Pokémon <small>(automática — clique para trocar)</small></span>
+          <input id="photoInput" type="file" accept="image/*" />
+          <div id="photoPreview" class="photo-preview empty">Escolha um Pokémon ou envie uma foto</div>
+        </label>
+
+        <label>
+          Cor do nome
+          <input id="colorInput" type="color" value="#ff4444" />
+        </label>
 
         <div class="grid-2">
           <label>
@@ -100,7 +106,7 @@
           </label>
           <label>
             IV máximo
-            <input id="ivMaxInput" type="number" min="0" />
+            <input id="ivMaxInput" type="number" min="0" value="192" />
           </label>
         </div>
 

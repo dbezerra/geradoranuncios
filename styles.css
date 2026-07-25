@@ -112,8 +112,67 @@ input[type="color"] {
   gap: 10px;
 }
 
+.name-field {
+  position: relative;
+}
+
+.name-suggestions {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  max-height: 260px;
+  overflow: auto;
+  background: #0f1218;
+  border: 1px solid #3a4150;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+.name-suggestions li {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.name-suggestions li:hover,
+.name-suggestions li.active {
+  background: #243044;
+}
+
+.name-suggestions img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  background: #000;
+  border-radius: 6px;
+}
+
+.name-suggestions .poke-name {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.name-suggestions .poke-id {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
 .photo-upload {
   cursor: pointer;
+}
+
+.photo-upload small {
+  color: var(--muted);
+  font-weight: 400;
 }
 
 .photo-upload input {
