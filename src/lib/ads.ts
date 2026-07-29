@@ -16,6 +16,7 @@ import {
   isFirebaseConfigured,
   requireAuthUser,
 } from "./firebase";
+import { CLOUD_SYNC_ENABLED } from "./authFlags";
 import {
   idbDeleteAd,
   idbGetAd,
@@ -406,11 +407,13 @@ export async function saveAd(
   onProgress?.("Salvando no aparelho...");
 
   let authUid = userId;
-  try {
-    const user = await requireAuthUser();
-    authUid = user.uid;
-  } catch {
-    // mantém userId recebido
+  if (CLOUD_SYNC_ENABLED) {
+    try {
+      const user = await requireAuthUser();
+      authUid = user.uid;
+    } catch {
+      // mantém userId recebido
+    }
   }
 
   const localAd: AdDocument = {
@@ -433,7 +436,7 @@ export async function saveAd(
   await idbSaveAd(localAd);
   upsertMeta(localAd);
 
-  if (isFirebaseConfigured() && getFirebaseDb()) {
+  if (CLOUD_SYNC_ENABLED && isFirebaseConfigured() && getFirebaseDb()) {
     onProgress?.("Enviando para a nuvem...");
     const result = await syncAdToCloud(localAd);
     if (result.ok) {

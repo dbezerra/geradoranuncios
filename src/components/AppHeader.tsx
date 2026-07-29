@@ -3,15 +3,17 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { AUTH_REQUIRED } from "@/lib/authFlags";
 
 export function AppHeader() {
   const router = useRouter();
   const { user, loading, configured, logout } = useAuth();
-  const loggedIn = Boolean(user) || (!configured && !loading);
+  const loggedIn =
+    !AUTH_REQUIRED || Boolean(user) || (!configured && !loading);
 
   return (
     <header className="site-header">
-      <Link href={loggedIn ? "/" : "/login"} className="brand">
+      <Link href="/" className="brand">
         Gerador de Anúncios
       </Link>
       <nav className="site-nav">
@@ -25,7 +27,9 @@ export function AppHeader() {
         )}
         {!loading && (
           <>
-            {user ? (
+            {!AUTH_REQUIRED ? (
+              <span className="muted small">Modo local</span>
+            ) : user ? (
               <button
                 type="button"
                 className="btn ghost"

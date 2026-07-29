@@ -19,6 +19,7 @@ import {
   googleProvider,
   isFirebaseConfigured,
 } from "@/lib/firebase";
+import { AUTH_REQUIRED } from "@/lib/authFlags";
 
 type AuthContextValue = {
   user: User | null;
@@ -51,6 +52,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setLocalUserId(getOrCreateLocalUserId());
+    // Modo local: não depende do Firebase Auth
+    if (!AUTH_REQUIRED) {
+      setLoading(false);
+      return;
+    }
     const auth = getFirebaseAuth();
     if (!auth) {
       setLoading(false);
@@ -68,8 +74,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
       configured,
       localUserId,
-      effectiveUserId: user?.uid || (configured ? null : localUserId),
+      effectiveUserId: AUTH_REQUIRED
+        ? user?.uid || (configured ? null : localUserId)
+        : localUserId,
       async loginWithGoogle() {
+        if (!AUTH_REQUIRED) {
+          throw new Error(
+            "Login Google está desativado. Ative AUTH_REQUIRED em src/lib/authFlags.ts."
+          );
+        }
         const auth = getFirebaseAuth();
         if (!auth) {
           throw new Error(
@@ -92,13 +105,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           if (code === "auth/popup-blocked") {
             throw new Error(
-              "O navegador bloqueou o popup. Permita popups para localhost:3000 e tente de novo."
+              "O navegador bloqueou o popup. Permita popups para este site e tente de novo."
             );
           }
           throw err;
         }
       },
       async logout() {
+        if (!AUTH_REQUIRED) return;
         const auth = getFirebaseAuth();
         if (!auth) return;
         await signOut(auth);

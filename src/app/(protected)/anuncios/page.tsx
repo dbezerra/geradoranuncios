@@ -13,6 +13,7 @@ import {
   syncBadge,
   testFirestoreWrite,
 } from "@/lib/ads";
+import { AUTH_REQUIRED, CLOUD_SYNC_ENABLED } from "@/lib/authFlags";
 import type { AdDocument } from "@/lib/types";
 
 export default function MyAdsPage() {
@@ -34,7 +35,7 @@ export default function MyAdsPage() {
   }, [effectiveUserId]);
 
   const pullCloud = useCallback(async () => {
-    if (!effectiveUserId) return;
+    if (!CLOUD_SYNC_ENABLED || !effectiveUserId) return;
     try {
       const merged = await pullAdsFromCloud(effectiveUserId);
       setAds(merged);
@@ -44,7 +45,7 @@ export default function MyAdsPage() {
   }, [effectiveUserId]);
 
   const syncAll = useCallback(async () => {
-    if (!effectiveUserId) return;
+    if (!CLOUD_SYNC_ENABLED || !effectiveUserId) return;
     setRefreshing(true);
     setError("");
     try {
@@ -69,7 +70,6 @@ export default function MyAdsPage() {
         alert(`${okCount} anúncio(s) sincronizado(s) com sucesso!`);
       } else {
         alert("Nada pendente para sincronizar (ou já estava sincronizado).");
-        // força re-sync de todos os que ainda estão error/pending visualmente
         const stillBad = pushed.filter(
           (a) => a.syncStatus === "error" || a.syncStatus === "pending"
         );
@@ -121,18 +121,21 @@ export default function MyAdsPage() {
         <div>
           <h1>Meus anúncios</h1>
           <p className="muted">
-            Logado como {user?.email || "—"}. Salva local na hora; use
-            Sincronizar se ficar pendente.
+            {AUTH_REQUIRED
+              ? `Logado como ${user?.email || "—"}. Salva local na hora; use Sincronizar se ficar pendente.`
+              : "Salvos neste navegador (modo local). Trocar de aparelho ou limpar dados apaga a lista."}
           </p>
         </div>
-        <button
-          type="button"
-          className="btn primary"
-          disabled={refreshing}
-          onClick={() => void syncAll()}
-        >
-          {refreshing ? "Sincronizando..." : "Sincronizar agora"}
-        </button>
+        {CLOUD_SYNC_ENABLED ? (
+          <button
+            type="button"
+            className="btn primary"
+            disabled={refreshing}
+            onClick={() => void syncAll()}
+          >
+            {refreshing ? "Sincronizando..." : "Sincronizar agora"}
+          </button>
+        ) : null}
       </div>
 
       {error && (

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { saveAd } from "@/lib/ads";
+import { AUTH_REQUIRED } from "@/lib/authFlags";
 import { canvasToJpeg, downloadDataUrl, shareWhatsApp } from "@/lib/export";
 import {
   DEFAULT_AD_BACKGROUND,
@@ -40,13 +41,14 @@ export function ExportActions({
   adId,
   disabled,
 }: Props) {
-  const { effectiveUserId, configured, user } = useAuth();
+  const { effectiveUserId, configured, user, localUserId } = useAuth();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [alsoSave, setAlsoSave] = useState(true);
 
   function requireUserId() {
+    if (!AUTH_REQUIRED) return localUserId || effectiveUserId;
     const uid = user?.uid || effectiveUserId;
     if (uid) return uid;
     if (configured) {
@@ -102,7 +104,7 @@ export function ExportActions({
   return (
     <div className="card">
       <h2>Exportar</h2>
-      {configured && !user && (
+      {AUTH_REQUIRED && configured && !user && (
         <p className="muted small">
           Faça login para salvar.{" "}
           <button
@@ -112,6 +114,11 @@ export function ExportActions({
           >
             Entrar com Google
           </button>
+        </p>
+      )}
+      {!AUTH_REQUIRED && (
+        <p className="muted small">
+          Os anúncios ficam salvos neste navegador (modo local).
         </p>
       )}
       <label className="check">

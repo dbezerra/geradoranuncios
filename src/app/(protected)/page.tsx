@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AUTH_REQUIRED } from "@/lib/authFlags";
 
 const types = [
   {
@@ -34,9 +35,11 @@ export default function HomePage() {
           <Link href="/anuncios" className="btn ghost">
             Meus anúncios
           </Link>
-          <Link href="/login" className="btn primary">
-            Entrar com Google
-          </Link>
+          {AUTH_REQUIRED ? (
+            <Link href="/login" className="btn primary">
+              Entrar com Google
+            </Link>
+          ) : null}
         </div>
       </section>
 
